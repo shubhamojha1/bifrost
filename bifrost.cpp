@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdint>
 #include <variant>
+#include <vector>
 
 using DataValue = std::variant<std::int64_t, double, std::string, std::monostate>;
 
@@ -36,8 +37,17 @@ class Value {
         }
 
         std::string toString() const {
-
-        }
+        if (isNull()) return "NULL";
+        return std::visit([](const auto& v) -> std::string {
+            if constexpr (std::is_same_v<std::decay_t<decltype(v)>, std::monostate>) {
+                return "NULL";
+            } else if constexpr (std::is_same_v<std::decay_t<decltype(v)>, std::string>) {
+                return v;
+            } else {
+                return std::to_string(v);
+            }
+        }, data);
+    }
 
         bool operator==(const Value& other) const {
             return data == other.data;
@@ -45,6 +55,41 @@ class Value {
 
         bool operator<(const Value& other) const {
             return data < other.data;
+        }
+};
+
+class Row {
+    private:
+        std::vector<Value> values_;
+
+    public:
+        Row() = default;
+        Row(std::vector<Value> values): values_(std::move(values)){}
+
+        const Value& operator[](size_t index) const {
+            return values_[index];
+        }
+
+        Value& operator[](size_t index) {
+            return values_[index];
+        }
+
+        size_t size() const { return values_.size(); }
+
+        void addValue(const Value& value) {
+            values_.push_back(value);
+        }
+        
+        const std::vector<Value>& getValues() const { return values_; }
+
+        std::string toString() const {
+            std::string result = "("; 
+            for(size_t i=0;i<values_.size();++i){
+                if(i>0) result += ", ";
+                result += values_[i].toString();
+            }
+            result += ")";
+            return result;
         }
 };
 
