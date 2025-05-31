@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <memory>
 #include <map>
+#include <optional>
 
 using DataValue = std::variant<std::int64_t, double, std::string, std::monostate>;
 
@@ -17,6 +18,12 @@ enum class DataType {
     DOUBLE, 
     STRING,
     NULL_VALUE
+};
+
+struct ColumnInfo {
+    std::string name;
+    DataType type;
+    size_t index;
 };
 
 class Value {
@@ -106,6 +113,60 @@ private:
     std::vector<ColumnInfo> schema_;
     std::vector<Row> rows_;
     std::string name_;
+
+public:
+    Table(const std::string& name) : name_(name) {}
+
+    void addColumn(const std::string& name, DataType type) {
+        schema_.push_back({name, type, schema_.size()});
+    }
+
+    void addRow(const Row& row) {
+        if (row.size() != schema_.size()) {
+            throw std::runtime_error("Row size doesn't match schema");
+        }
+        rows_.push_back(row);
+    }
+
+    const Row& getRow(size_t index) const {
+        return rows_[index];
+    }
+
+    size_t rowCount() const { return rows_.size(); }
+    size_t columnCount() const { return schema_.size(); }
+
+    const std::vector<ColumnInfo>& getSchema() const { return schema_; }
+    const std::vector<Row>& getRows() const { return rows_; }
+    const std::string& getName() const { return name_; }
+
+    std::optional<size_t> getColumnIndex(const std::string& colName) const {
+        for (const auto& col : schema_) {
+            if (col.name == colName) return col.index;
+        }
+        return std::nullopt;
+    }
+
+    void clear() {
+        rows_.clear();
+    }
+
+    // size_t estimateMemoryUsage() const {
+
+    // }
+
+    void printSchema() const {
+        std::cout << "Table: " << name_ << std::endl;
+        std::cout << "Schema: ";
+        for(size_t i=0; i<schema_.size(); ++i) {
+            if(i>0) std::cout << ", ";
+            std::cout << schema_[i].name;
+        }
+        std::cout << std::endl;
+    }
+
+    // void printSample(size_t maxRows = 5) const {
+
+    // }
 };
 
 
