@@ -10,6 +10,7 @@
 #include <memory>
 #include <map>
 #include <optional>
+#include <sstream>
 
 using DataValue = std::variant<std::int64_t, double, std::string, std::monostate>;
 
@@ -173,12 +174,62 @@ public:
 class DataLoader {
     private:
         std::vector<std::string> split(const std::string& str, char delimiter) {
-
+             std::vector<std::string> tokens;
+            std::stringstream ss(str);
+            std::string token;
+            
+            while (std::getline(ss, token, delimiter)) {
+                // Trim whitespace
+                token.erase(0, token.find_first_not_of(" \t\r\n"));
+                token.erase(token.find_last_not_of(" \t\r\n") + 1);
+                tokens.push_back(token);
+            }
+            return tokens;
         }
 
         DataType inferType(const std::string& value) {
+            if (value.empty() || value == "NULL" || value == "null") {
+                return DataType::NULL_VALUE;
+            }
 
+            try {
+                std::stoll(value);
+                return DataType::INTEGER;
+            } catch (...) {}
+
+            // Try double
+            try {
+                std::stod(value);
+            } catch (...) {}
+        
+            return DataType::STRING;
         }
+
+        Value parseValue(const std::string& str, DataType type) {
+        if (str.empty() || str == "NULL" || str == "null") {
+            return Value();
+        }
+        
+        switch (type) {
+            case DataType::INTEGER:
+                try {
+                    return Value(std::stoll(str));
+                } catch (...) {
+                    return Value();
+                }
+            case DataType::DOUBLE:
+                try {
+                    return Value(std::stod(str));
+                } catch (...) {
+                    return Value();
+                }
+            case DataType::STRING:
+                return Value(str);
+            default:
+                return Value();
+        }
+    }
+
 
     public:
         std::unique_ptr<Table> loadFromCSV(const std::string& filename, const std::string& tablename) {
@@ -259,11 +310,11 @@ class DataLoader {
 
 int main() {
     std::cout << "Bifrost - An implementation of Hash Tables in database joins" << std::endl;
-    uint64_t seed = 1;
-    uint64_t hash_otpt[2];
-    const char *key = "hi";
+    // uint64_t seed = 1;
+    // uint64_t hash_otpt[2];
+    // const char *key = "hi";
 
-    MurmurHash3_x64_128(key, (uint64_t)strlen(key), seed, hash_otpt);
+    // MurmurHash3_x64_128(key, (uint64_t)strlen(key), seed, hash_otpt);
 
-    std::cout << "hashed" << hash_otpt[0] << hash_otpt[1] << std::endl;
+    // std::cout << "hashed" << hash_otpt[0] << hash_otpt[1] << std::endl;
 }
