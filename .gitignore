@@ -32,3 +32,5 @@
 *.app
 
 .vscode/
+# ai can generate code that looks sexy. but doesnt do shit.
+ai_slop/
