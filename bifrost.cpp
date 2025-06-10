@@ -6,41 +6,24 @@
 
 void testWithCSVFiles() {
     std::cout << "=== CSV File Test ===\n";
-    
-    // Create sample CSV files for testing
-    std::ofstream emp_file("employees.csv");
-    emp_file << "emp_id,name,dept_id\n";
-    emp_file << "1,Alice,10\n2,Bob,20\n3,Charlie,10\n4,Diana,30\n";
-    emp_file.close();
-    
-    std::ofstream dept_file("departments.csv");
-    dept_file << "dept_id,dept_name,budget\n";
-    dept_file << "10,Engineering,500000.0\n20,Marketing,200000.0\n30,Sales,300000.0\n";
-    dept_file.close();
-    
-    try {
+      try {
         DataLoader loader;
-        auto employees = loader.loadFromCSV("employees.csv", "Employees");
-        auto departments = loader.loadFromCSV("departments.csv", "Departments");
-        
+        auto students = loader.loadFromCSV("assets/csv/students.csv", "Students");
+        auto grades = loader.loadFromCSV("assets/csv/grades.csv", "Grades");
         std::cout << "Loaded tables from CSV:\n";
-        employees->printSample();
-        departments->printSample();
+        students->printSample();
+        grades->printSample();
         
         // JoinEngine engine;
-        // auto result = engine.hashJoin(*employees, "dept_id", *departments, "dept_id");
+        // auto result = engine.hashJoin(*students, "student_id", *grades, "student_id");
         
         // std::cout << "Join result:\n";
         // result->printSample();
         
         // engine.getProfiler().printReport();
         
-        // Cleanup
-        std::remove("employees.csv");
-        std::remove("departments.csv");
-        
     } catch (const std::exception& e) {
-        std::cerr << "CSV test failed: " << e.what() << std::endl;
+        std::cerr << "CSV loading failed: " << e.what() << std::endl;
     }
 }
 
