@@ -1,4 +1,5 @@
 // to generate profile for the entire join operation
+#pragma once
 #include <chrono>
 #include "CustomHashTable.h"
 class Profiler{
