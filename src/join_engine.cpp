@@ -2,6 +2,24 @@
 #include "JoinEngine.h"
 #include "HashFunction.h"
 
+// struct ValueHasher {
+//     std::size_t operator()(const Value& v) const {
+//         return std::visit([](const auto& val) -> std::size_t {
+//             using T = std::decay_t<decltype(val)>;
+//             if constexpr (std::is_same_v<T, std::monostate>) {
+//                 return 0;
+//             } else if constexpr (std::is_same_v<T, std::string>) {
+//                 return std::hash<std::string>{}(val);
+//             } else if constexpr (std::is_same_v<T, std::int64_t>) {
+//                 return std::hash<std::int64_t>{}(val);
+//             } else if constexpr (std::is_same_v<T, double>) {
+//                 return std::hash<double>{}(val);
+//             }
+//             return 0;
+//         }, v.data);
+//     }
+// };
+
 std::pair<const Table *, const Table *> JoinEngine::chooseBuildProbe(const Table &left, const Table &right)
 {
     if (left.rowCount() <= right.rowCount())
@@ -77,14 +95,18 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
         result->addColumn("R_" + col.name, col.type);
     }
 
-    // BUILD PHASE
-    // create hashtable with chosen hash function
+    // BUILD PHASE    // create hashtable with chosen hash function
     auto hasher = HashFunctionFactory<Value>::create("valuehasher");
     // auto hasher = HashFunctionFactory<Value>::create("murmur", 42); // or "standard" for default hash
 
-    CustomHashTable<Value, size_t, std::remove_reference_t<decltype(*hasher)>>
-        hashTable(buildTable->rowCount() * 2, strategy);
+    // CustomHashTable<Value, size_t, HashFunction<Value>> hashTable(
+    //     buildTable->rowCount() * 2, 
+    //     strategy,
+    //     *hasher  // Pass the hash function instance directly
+    // );
+    CustomHashTable<Value, size_t, ValueHasher> hashTable(buildTable->rowCount() * 2, strategy);
 
+    
     for (size_t i = 0; i < buildTable->rowCount(); ++i)
     {
         const Value &joinKey = buildTable->getRow(i)[buildColIdx];

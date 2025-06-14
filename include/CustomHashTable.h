@@ -50,6 +50,10 @@ class CustomHashTable {
 
     public:
         CustomHashTable(size_t initialCapacity = 16, CollisionStrategy strategy = CollisionStrategy::CHAINING);
+        // CustomHashTable(size_t capacity, CollisionStrategy strategy, Hash hasher = Hash())
+        //     : size_(0), capacity_(capacity), strategy_(strategy), hasher_(std::move(hasher)) {
+        //     table_.resize(capacity);
+        // }
         void insert(const Key& key, const Value& value);
         std::vector<Value> find(const Key& key) const;
         bool contains(const Key& key) const;
@@ -61,4 +65,4 @@ class CustomHashTable {
         size_t estimateMemoryUsage() const;
 };
 
-#include "../src/custom_hash_table.hpp"
+// #include "../src/custom_hash_table.hpp"

@@ -14,18 +14,18 @@ public:
     virtual const char* getName() const = 0;
 };
 
-// Standard hash implementation
-template<typename T>
-class StandardHasher : public HashFunction<T> {
-public:
-    size_t operator()(const T& value) const override {
-        return std::hash<T>{}(value);
-    }
+// // Standard hash implementation
+// template<typename T>
+// class StandardHasher : public HashFunction<T> {
+// public:
+//     size_t operator()(const T& value) const override {
+//         return std::hash<T>{}(value);
+//     }
     
-    const char* getName() const override {
-        return "StandardHash";
-    }
-};
+//     const char* getName() const override {
+//         return "StandardHash";
+//     }
+// };
 
 // Specialization for Value type using standard hash
 class ValueHasher : public HashFunction<Value> {
@@ -94,10 +94,10 @@ public:
         if (type == "murmur") {
             return std::make_unique<MurmurValueHasher>(seed);
         } else if(type == "valuehasher") {
-            return std::make_unique<ValueHasher>();
-        } else if (type == "standard") {
-            return std::make_unique<StandardHasher<T>>();
-        }
+            return std::make_unique<ValueHasher>();}
+        // } else if (type == "standard") {
+        //     return std::make_unique<StandardHasher<T>>();
+        // }
         // Add more hash function types here
         
         throw std::runtime_error("Unknown hash function type: " + type);
