@@ -4,7 +4,7 @@ a dummy implementation of how hash tables are used in database engines when perf
 
 comparing various hash functions for database joins (inner, outer, left, right)
 
-command to run: g++ -Iinclude bifrost.cpp src/*.cpp -o bifrost.exe; ./bifrost
+command to run: g++ -std=c++17 -Iinclude bifrost.cpp src/*.cpp -o bifrost
 
 includes all header files and src files
 
