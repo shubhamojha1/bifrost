@@ -135,3 +135,25 @@ std::unique_ptr<Table> DataLoader::loadFromCSV(const std::string& filename, cons
 
     return table;
 }
+
+
+std::unique_ptr<Table> DataLoader::generateTestTable(const std::string& name, size_t rows, int seed = 42) {
+        srand(seed);
+        auto table = std::make_unique<Table>(name);
+        
+        table->addColumn("id", DataType::INTEGER);
+        table->addColumn("value", DataType::INTEGER);
+        table->addColumn("name", DataType::STRING);
+        table->addColumn("score", DataType::DOUBLE);
+        
+        for (size_t i = 0; i < rows; ++i) {
+            Row row;
+            row.addValue(Value(static_cast<std::int64_t>(i + 1)));
+            row.addValue(Value(static_cast<std::int64_t>(rand() % 100)));
+            row.addValue(Value("Item_" + std::to_string(i % 50)));
+            row.addValue(Value(static_cast<double>(rand()) / RAND_MAX * 100.0));
+            table->addRow(row);
+        }
+        
+        return table;
+    }

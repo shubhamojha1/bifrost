@@ -1,6 +1,8 @@
 #include "Table.h"
 #include <iostream>
 #include <algorithm>
+#include <variant>
+#include <string>
 
 void Table::addRow(const Row& row) {
     if (row.size() != schema_.size()) {
@@ -39,6 +41,20 @@ std::optional<size_t> Table::getColumnIndex(const std::string& colName) const {
     }
     return std::nullopt;
 }
+size_t Table::estimateMemoryUsage() const {
+    size_t total = sizeof(*this);
+    total += schema_.capacity() * sizeof(ColumnInfo);
+    total += rows_.capacity() * sizeof(Row);
+    
+    for (const auto& row : rows_) {
+        for (const auto& value : row.getValues()) {
+            if (std::holds_alternative<std::string>(value.data)) {
+                total += std::get<std::string>(value.data).capacity();
+            }
+        }
+    }
+    return total;
+}
 
 void Table::clear() {
     rows_.clear();
@@ -65,3 +81,4 @@ void Table::printSample(size_t maxRows) const {
     }
     std::cout << std::endl;
 }
+

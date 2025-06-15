@@ -13,4 +13,5 @@ class DataLoader {
 
     public:
         std::unique_ptr<Table> loadFromCSV(const std::string& filename, const std::string& tablename);
+        std::unique_ptr<Table> generateTestTable(const std::string& name, size_t rows, int seed);
 };

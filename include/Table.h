@@ -38,6 +38,7 @@ public:
     const std::vector<Row>& getRows() const;
     const std::string& getName() const;
     std::optional<size_t> getColumnIndex(const std::string& colName) const;
+    size_t estimateMemoryUsage() const;
     void clear();
     void printSchema() const;
     void printSample(size_t maxRows = 5) const;
