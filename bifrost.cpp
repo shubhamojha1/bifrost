@@ -118,7 +118,7 @@ void demonstrateAdvancedFeatures() {
         engine.getProfiler().printReport();
     }
     
-    std::cout << "\nTesting collision strategies:\n";
+    std::cout << "\nTesting collision strategies (INNER JOIN):\n";
     const std::vector<std::pair<CollisionStrategy, std::string>> strategies = {
         {CollisionStrategy::CHAINING, "Chaining"},
         {CollisionStrategy::LINEAR_PROBING, "Linear Probing"}

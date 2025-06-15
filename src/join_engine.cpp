@@ -80,33 +80,30 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
     size_t buildColIdx = leftIsBuild ? *leftColIdx : *rightColIdx;
     size_t probeColIdx = leftIsBuild ? *rightColIdx : *leftColIdx;
 
-    // create result with combined schema
+    // Create result with combined schema
     auto result = std::make_unique<Table>("JoinResult");
 
-    // add columns from left table
+    // Add columns from left table
     for (const auto &col : leftTable.getSchema())
     {
         result->addColumn("L_" + col.name, col.type);
     }
 
-    // add columns from right table
+    // Add columns from right table
     for (const auto &col : rightTable.getSchema())
     {
         result->addColumn("R_" + col.name, col.type);
     }
 
-    // BUILD PHASE    // create hashtable with chosen hash function
-    auto hasher = HashFunctionFactory<Value>::create("valuehasher");
-    // auto hasher = HashFunctionFactory<Value>::create("murmur", 42); // or "standard" for default hash
+    // BUILD PHASE
+    // ValueHasher hasher;
+    MurmurValueHasher hasher;
+    CustomHashTable<Value, size_t, MurmurValueHasher> hashTable(
+        buildTable->rowCount() * 2,
+        strategy,
+        hasher);
 
-    // CustomHashTable<Value, size_t, HashFunction<Value>> hashTable(
-    //     buildTable->rowCount() * 2, 
-    //     strategy,
-    //     *hasher  // Pass the hash function instance directly
-    // );
-    CustomHashTable<Value, size_t, ValueHasher> hashTable(buildTable->rowCount() * 2, strategy);
-
-    
+    // Build phase
     for (size_t i = 0; i < buildTable->rowCount(); ++i)
     {
         const Value &joinKey = buildTable->getRow(i)[buildColIdx];
@@ -117,7 +114,6 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
     profiler_.recordHashStats(hashTable.getStats());
 
     // PROBE PHASE
-    // Probe with other table
     std::vector<bool> buildMatched(buildTable->rowCount(), false);
 
     for (size_t probeIdx = 0; probeIdx < probeTable->rowCount(); ++probeIdx)
@@ -127,7 +123,6 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
 
         if (!matchingBuildIndices.empty())
         {
-            // matches found
             for (size_t buildIdx : matchingBuildIndices)
             {
                 buildMatched[buildIdx] = true;
@@ -140,14 +135,8 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
         }
         else if (joinType == JoinType::LEFT_OUTER || joinType == JoinType::FULL_OUTER)
         {
-            // no match found, but need left outer join behavior
-            if (leftIsBuild && joinType == JoinType::FULL_OUTER)
+            if (!leftIsBuild)
             {
-                // ? //
-            }
-            else if (!leftIsBuild)
-            {
-                // left table is probe table, add with null right side
                 const Row &leftRow = probeTable->getRow(probeIdx);
                 const Row nullRightRow = createNullRow(rightTable.columnCount());
                 result->addRow(combineRows(leftRow, nullRightRow));
@@ -155,7 +144,7 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
         }
     }
 
-    // handle unmatched build talbe rows for outer joins
+    // Handle unmatched build table rows for outer joins
     if (joinType == JoinType::RIGHT_OUTER || joinType == JoinType::FULL_OUTER)
     {
         for (size_t buildIdx = 0; buildIdx < buildTable->rowCount(); ++buildIdx)
@@ -164,14 +153,12 @@ std::unique_ptr<Table> JoinEngine::hashJoin(
             {
                 if (leftIsBuild)
                 {
-                    // Left table was build, add with null right side
                     const Row &leftRow = buildTable->getRow(buildIdx);
                     const Row nullRightRow = createNullRow(rightTable.columnCount());
                     result->addRow(combineRows(leftRow, nullRightRow));
                 }
                 else
                 {
-                    // Right table was build, add with null left side
                     const Row nullLeftRow = createNullRow(leftTable.columnCount());
                     const Row &rightRow = buildTable->getRow(buildIdx);
                     result->addRow(combineRows(nullLeftRow, rightRow));
