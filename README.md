@@ -1,6 +1,6 @@
 # Bifrost: Hash Join Engine Implementation
 
-A modern C++ implementation of hash join algorithms commonly used in database engines, demonstrating various join operations and hash table optimizations.
+C++ implementation of hash join algorithms with multiple join types, optimized hash tables, and performance benchmarking.
 
 ![Hash Join Visualization](./assets/uqn12o5d.png)
 
