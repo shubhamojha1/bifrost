@@ -33,5 +33,14 @@ class JoinEngine {
         CollisionStrategy strategy = CollisionStrategy::CHAINING
     );
 
+    std::unique_ptr<Table> nestedLoopJoin(
+        const Table& outerTable,
+        const std::string& outerColumn,
+        const Table& innerTable,
+        const std::string& innerColumn,
+        JoinType joinType = JoinType::INNER,
+        CollisionStrategy strategy = CollisionStrategy::CHAINING
+    );
+
     const Profiler& getProfiler() const;
 };
