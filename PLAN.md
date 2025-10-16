@@ -15,7 +15,7 @@ Bifrost will follow a layered architecture with pluggable components:
 │   Transaction Manager (MVCC + Lock Manager)         │
 ├─────────────────────────────────────────────────────┤
 │  Storage Engine Interface (Pluggable Backends)      │
-│    ├─ In-Memory  ├─ File-Based  ├─ Page-Based      │
+│    ├─ In-Memory  ├─ File-Based  ├─ Page-Based       │
 │    └─ LSM-Tree (RocksDB-style)                      │
 ├─────────────────────────────────────────────────────┤
 │     Recovery & Logging (WAL + Checkpointing)        │

@@ -1,6 +1,6 @@
-# Bifrost: Hash Join Engine Implementation
+# Bifrost: 
 
-C++ implementation of hash join algorithms with multiple join types, optimized hash tables, and performance benchmarking.
+A modern C++ implementation of hash join algorithms commonly used in database engines, demonstrating various join operations and hash table optimizations.
 
 ![Hash Join Visualization](./assets/uqn12o5d.png)
 
@@ -92,10 +92,17 @@ The engine includes comprehensive performance monitoring:
 - Hash table statistics
 - Join selectivity metrics
 
-## License
+## Future Work
+- Support for nested loop joins, sort-merge joins, partitioned hash joins
+- Query processing engine (SQL parser, optimizer, execution engine)
+- Concurrency control (multi-threading, transaction manager, lock manager)
+- recovery and durability features (write-ahead logging, checkpointing)
+- distributed join algorithms (map-reduce style joins, distributed hash joins)
+- Integration with existing database systems (PostgreSQL, SQLite)
+- Support for more complex data types (JSON, XML, etc.)
 
-This project is open source and available under the MIT License.
-
----
-
-*Note: This implementation is for educational purposes, demonstrating database internals and join algorithms.*
+# Storage Engine
+## In-Memory Engine -> unordered map
+## Log-BasedStorage Engine -> Append only
+## LSMStorage Engine -> LSM Tree
+## PagedStorage Engine -> B+ Tree
